@@ -1,6 +1,6 @@
 FROM adoptopenjdk/openjdk11:x86_64-ubuntu-jdk-11.0.7_10
 
-RUN apt-get update
+RUN apt-get update -y
 RUN apt-get install -y supervisor
 
 #RUN mkdir -p /opt/cloudbeaver
