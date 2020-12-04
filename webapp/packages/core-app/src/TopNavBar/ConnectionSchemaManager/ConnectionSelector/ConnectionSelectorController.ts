@@ -43,16 +43,18 @@ export class ConnectionSelectorController {
     return driverIcon;
   }
 
-  get isConnectionSelectorVisible() {
+  get isConnectionSelectorVisible(): boolean {
     return this.connectionSelectorService.currentConnectionId !== null
      || (this.connectionSelectorService.currentConnectionId === null
         && this.connectionSelectorService.isConnectionChangeable);
   }
 
-  get isObjectContainerSelectorVisible() {
-    return this.currentConnection?.connected
-      && this.getObjectContainerItems().length !== 0
-      && !this.objectContainerSelectionDisabled;
+  get isObjectContainerSelectorVisible(): boolean {
+    return !!this.currentConnection?.connected
+      && (
+        this.connectionSelectorService.currentObjectSchemaId !== undefined
+        || this.connectionSelectorService.currentObjectCatalogId !== undefined
+      );
   }
 
   @computed get objectContainerSelectionDisabled(): boolean {
@@ -134,36 +136,25 @@ export class ConnectionSelectorController {
     if (!this.connectionSelectorService.objectContainerList) {
       return [];
     }
+
     const list = this.connectionSelectorService.objectContainerList
       .filter(item => !!item.name)
       .map(item => {
-        if (item.features?.includes(EObjectFeature.catalog)) {
-          const title = NodeManagerUtils.concatSchemaAndCatalog(
-            item.name,
-            this.connectionSelectorService.currentObjectSchemaId
-          );
-          const handler = item.features?.includes(EObjectFeature.catalog)
-            ? () => this.connectionSelectorService.selectCatalog(item.name!)
-            : () => this.connectionSelectorService.selectSchema(item.name!);
-
-          const menuItem: IMenuItem = {
-            id: item.name!,
-            title,
-            onClick: handler,
-          };
-          return menuItem;
-        }
+        const isCatalog = item.features?.includes(EObjectFeature.catalog);
+        const catalogName = isCatalog ? item.name : this.connectionSelectorService.currentObjectCatalogId;
+        const schemaName = !isCatalog ? item.name : this.connectionSelectorService.currentObjectSchemaId;
 
         const title = NodeManagerUtils.concatSchemaAndCatalog(
-          this.connectionSelectorService.currentObjectCatalogId,
-          item.name
+          catalogName,
+          schemaName
         );
-        const handler = item.features?.includes(EObjectFeature.catalog)
-          ? () => this.connectionSelectorService.selectCatalog(item.name!)
-          : () => this.connectionSelectorService.selectSchema(item.name!);
+
+        const handler = isCatalog
+          ? () => this.connectionSelectorService.selectCatalog(catalogName!)
+          : () => this.connectionSelectorService.selectSchema(schemaName!);
 
         const menuItem: IMenuItem = {
-          id: item.name!,
+          id: title,
           title,
           onClick: handler,
         };
