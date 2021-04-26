@@ -28,7 +28,7 @@ interface PropertiesTableProps {
   onKeyChange?: (id: string, name: string) => void;
   onChange?: (state: PropertiesState) => void;
   onAdd?: () => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (property: IProperty) => void;
   className?: string;
 }
 
@@ -92,9 +92,8 @@ export const PropertiesTable = observer(function PropertiesTable(props: Properti
     }
 
     if (onRemove) {
-      onRemove(id);
+      onRemove(property);
     }
-    properties.splice(properties.indexOf(property), 1);
   }, []);
 
   const isKeyUnique = useCallback(

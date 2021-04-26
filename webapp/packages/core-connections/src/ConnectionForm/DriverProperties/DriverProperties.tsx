@@ -50,7 +50,11 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
       });
     }
 
-    return { propertiesList, add };
+    function remove(property: IProperty) {
+      propertiesList.splice(propertiesList.indexOf(property), 1);
+    }
+
+    return { propertiesList, add, remove };
   });
 
   const driver = useMapResource(
@@ -95,6 +99,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
             propertiesState={formState.config.properties}
             readOnly={formState.readonly}
             onAdd={state.add}
+            onRemove={state.remove}
           />
         )}
       </Loader>
